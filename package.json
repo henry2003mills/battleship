@@ -1,0 +1,11 @@
+{
+  "name": "battleship",
+  "version": "1.0.0",
+  "description": "Single-page Battleship vs. a hunt-and-target computer opponent",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/"
+  },
+  "license": "MIT"
+}

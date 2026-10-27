@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Battleship</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9A%93</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Battleship</h1>
+    <button id="restart-btn" type="button">Restart</button>
+  </header>
+
+  <p id="status" role="status" aria-live="polite"></p>
+
+  <section id="setup-panel" aria-label="Ship placement">
+    <div class="setup-ships" id="ship-list"></div>
+    <div class="setup-actions">
+      <button id="rotate-btn" type="button">Rotate (R): <span id="orientation">Horizontal</span></button>
+      <button id="random-btn" type="button">Place randomly</button>
+      <button id="clear-btn" type="button">Clear</button>
+      <button id="start-btn" type="button" class="primary" disabled>Start game</button>
+    </div>
+  </section>
+
+  <main class="boards">
+    <section class="board-wrap">
+      <h2>Your fleet</h2>
+      <div id="player-board" class="board" aria-label="Your board"></div>
+      <ul class="fleet-status" id="player-fleet"></ul>
+    </section>
+    <section class="board-wrap">
+      <h2>Enemy waters</h2>
+      <div id="computer-board" class="board" aria-label="Enemy board"></div>
+      <ul class="fleet-status" id="computer-fleet"></ul>
+    </section>
+  </main>
+
+  <section class="log-wrap">
+    <h2>Battle log</h2>
+    <ol id="log" reversed></ol>
+  </section>
+
+  <div id="overlay" class="overlay hidden" role="dialog" aria-modal="true">
+    <div class="overlay-card">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-text"></p>
+      <button id="overlay-restart" type="button" class="primary">Play again</button>
+    </div>
+  </div>
+
+  <script type="module" src="src/ui.js"></script>
+</body>
+</html>
