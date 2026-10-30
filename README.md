@@ -10,7 +10,7 @@ Single-page Battleship in plain HTML, CSS and JavaScript (no build step, no depe
    - Or click **Place randomly** (random placement never lets ships touch). **Clear** removes all placed ships.
    - Each ship has its own color, shown in the legend under each board.
 2. Press **Start game**, then click cells in *Enemy waters* to fire. You go first.
-3. Misses show a dot, hits a factory icon on red, and sunk ships turn dark red. Sunk ships are announced and logged.
+3. Misses show a dot, hits a 🏭 factory emoji on red, and sunk ships turn dark red. Sunk ships are announced and logged.
 4. Sink all 5 enemy ships to win. **Restart** starts a new game at any time.
 
 The computer places its ships randomly and uses a **hunt-and-target** strategy: it fires at random until it gets a hit, then tries adjacent cells (and follows the line once it has two hits in a row) until the ship sinks, then goes back to hunting.
