@@ -81,7 +81,10 @@ button.primary:hover:not(:disabled) { background: #3a8ce3; }
 }
 .cell.hit { --fill: var(--hit); }
 .cell.hit::after, .cell.sunk::after {
-  content: "\1F3ED"; font-size: 1.15em; line-height: 1;
+  content: "\2715"; color: #fff; font-size: 1.1em; line-height: 1;
+}
+#computer-board .cell.hit::after, #computer-board .cell.sunk::after {
+  content: "\1F3ED"; color: initial; font-size: 1.15em; line-height: 1;
   font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 .cell.sunk { --fill: var(--sunk); }
