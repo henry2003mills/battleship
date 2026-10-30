@@ -47,13 +47,33 @@ export function placeShip(board, { name, length }, row, col, horizontal) {
   return ship;
 }
 
-export function placeFleetRandomly(board, fleet = FLEET, rng = Math.random) {
+export function touchesOtherShip(board, length, row, col, horizontal) {
+  return getShipCells(length, row, col, horizontal).some(([r, c]) => {
+    for (let dr = -1; dr <= 1; dr++)
+      for (let dc = -1; dc <= 1; dc++)
+        if (inBounds(board, r + dr, c + dc) && board.cells[r + dr][c + dc].shipIndex !== null)
+          return true;
+    return false;
+  });
+}
+
+/**
+ * Places the fleet at random. By default ships never touch (not even diagonally),
+ * so every ship is visually distinct; pass { allowTouching: true } to relax this.
+ */
+export function placeFleetRandomly(
+  board,
+  fleet = FLEET,
+  rng = Math.random,
+  { allowTouching = false } = {}
+) {
   for (const spec of fleet) {
     for (let attempt = 0; ; attempt++) {
       if (attempt > 10000) throw new Error(`Could not place ${spec.name}`);
       const horizontal = rng() < 0.5;
       const row = Math.floor(rng() * board.size);
       const col = Math.floor(rng() * board.size);
+      if (!allowTouching && touchesOtherShip(board, spec.length, row, col, horizontal)) continue;
       if (placeShip(board, spec, row, col, horizontal)) break;
     }
   }

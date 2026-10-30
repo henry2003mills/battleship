@@ -34,6 +34,19 @@ const els = {
 };
 
 const COMPUTER_DELAY_MS = 600;
+const SHIP_COLORS = {
+  Carrier: '#a7b1bd',
+  Battleship: '#c9ad74',
+  Cruiser: '#86b894',
+  Submarine: '#b493c2',
+  Destroyer: '#7fbcd6',
+};
+const JOIN_DIRS = [
+  ['up', -1, 0, '0 -2px'],
+  ['down', 1, 0, '0 2px'],
+  ['left', 0, -1, '-2px 0'],
+  ['right', 0, 1, '2px 0'],
+];
 const COLS = 'ABCDEFGHIJ';
 const coord = (r, c) => `${COLS[c]}${r + 1}`;
 
@@ -98,14 +111,34 @@ function cellEl(container, r, c) {
 }
 
 function paintBoard(container, board, { revealShips, last }) {
+  const visibleShip = (r, c) => {
+    const index = board.cells[r]?.[c]?.shipIndex;
+    if (index === null || index === undefined) return null;
+    const ship = board.ships[index];
+    return revealShips || ship.hits >= ship.length ? index : null;
+  };
   for (let r = 0; r < BOARD_SIZE; r++) {
     for (let c = 0; c < BOARD_SIZE; c++) {
       const el = cellEl(container, r, c);
       const { shipIndex, shot } = board.cells[r][c];
       const ship = shipIndex === null ? null : board.ships[shipIndex];
       const sunk = ship && ship.hits >= ship.length;
+      const shown = visibleShip(r, c);
       el.className = 'cell';
-      if (ship && (revealShips || sunk)) el.classList.add('ship');
+      el.style.removeProperty('--ship-color');
+      el.style.boxShadow = '';
+      if (shown !== null) {
+        el.classList.add('ship');
+        el.style.setProperty('--ship-color', SHIP_COLORS[ship.name]);
+        const shadows = [];
+        for (const [name, dr, dc, offset] of JOIN_DIRS) {
+          if (visibleShip(r + dr, c + dc) === shown) {
+            el.classList.add(`join-${name}`);
+            shadows.push(`${offset} 0 var(--fill)`);
+          }
+        }
+        el.style.boxShadow = shadows.join(', ');
+      }
       if (shot) el.classList.add(ship ? (sunk ? 'sunk' : 'hit') : 'miss');
       else el.classList.add('targetable');
       if (last && last[0] === r && last[1] === c) el.classList.add('last-shot');
@@ -130,7 +163,10 @@ function renderFleetStatus(listEl, board, showAll) {
     const ship = board.ships.find((s) => s.name === spec.name);
     const li = document.createElement('li');
     const sunk = ship && ship.hits >= ship.length;
-    li.textContent = `${spec.name} (${spec.length})${sunk ? ' - sunk' : ''}`;
+    const swatch = document.createElement('span');
+    swatch.className = 'swatch';
+    swatch.style.background = SHIP_COLORS[spec.name];
+    li.append(swatch, `${spec.name} (${spec.length})${sunk ? ' - sunk' : ''}`);
     if (sunk) li.classList.add('sunk');
     if (showAll || ship) listEl.appendChild(li);
   }
@@ -143,7 +179,10 @@ function renderSetup() {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'ship-choice';
-    b.textContent = `${spec.name} (${spec.length})`;
+    const swatch = document.createElement('span');
+    swatch.className = 'swatch';
+    swatch.style.background = SHIP_COLORS[spec.name];
+    b.append(swatch, `${spec.name} (${spec.length})`);
     if (placed.has(spec.name)) {
       b.classList.add('placed');
       b.disabled = true;

@@ -64,27 +64,36 @@ button.primary:hover:not(:disabled) { background: #3a8ce3; }
   font-size: 0.8rem; opacity: 0.7;
 }
 .cell {
-  background: var(--water); border-radius: 3px; position: relative;
+  --fill: var(--water);
+  background: var(--fill); border-radius: 3px; position: relative;
   display: flex; align-items: center; justify-content: center;
   font-weight: bold; padding: 0; border: none;
 }
-.cell.ship { background: var(--ship); }
-.cell.preview-ok { background: var(--ok); }
-.cell.preview-bad { background: var(--bad); }
+.cell.ship { --fill: var(--ship-color, var(--ship)); }
+.cell.join-up { border-top-left-radius: 0; border-top-right-radius: 0; }
+.cell.join-down { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.cell.join-left { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.cell.join-right { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.cell.preview-ok { --fill: var(--ok); }
+.cell.preview-bad { --fill: var(--bad); }
 .cell.miss::after {
   content: ""; width: 30%; height: 30%; border-radius: 50%; background: var(--miss);
 }
-.cell.hit { background: var(--hit); }
+.cell.hit { --fill: var(--hit); }
 .cell.hit::after, .cell.sunk::after {
   content: ""; width: 68%; height: 68%;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M2 21V3h4v8l5-3v3l5-3v3l6-3.5V21zM5 15h3v3H5zm5.5 0h3v3h-3zm5.5 0h3v3h-3z'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-.cell.sunk { background: var(--sunk); }
+.cell.sunk { --fill: var(--sunk); }
 .cell.sunk::after { opacity: 0.55; }
-#computer-board.active .cell.targetable:hover { background: var(--water-hover); cursor: crosshair; }
-.cell.last-shot { box-shadow: 0 0 0 2px #ffd54a inset; }
+#computer-board.active .cell.targetable:hover { --fill: var(--water-hover); cursor: crosshair; }
+.cell.last-shot { outline: 2px solid #ffd54a; outline-offset: -2px; z-index: 1; }
 
 .fleet-status { list-style: none; padding: 0; margin: 8px 0 0; font-size: 0.9rem; }
+.swatch {
+  display: inline-block; width: 0.8em; height: 0.8em; border-radius: 2px;
+  margin-right: 6px; vertical-align: -0.05em;
+}
 .fleet-status li.sunk { text-decoration: line-through; color: #ff8b78; }
 
 .log-wrap { max-width: 980px; margin: 20px auto 0; }

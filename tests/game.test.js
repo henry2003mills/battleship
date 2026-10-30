@@ -7,6 +7,7 @@ import {
   canPlaceShip,
   placeShip,
   placeFleetRandomly,
+  touchesOtherShip,
   receiveAttack,
   isSunk,
   allShipsSunk,
@@ -76,6 +77,28 @@ describe('placement', () => {
       }
       assert.equal(seen.size, 17);
     }
+  });
+
+  test('random placement never lets ships touch, even diagonally', () => {
+    for (let seed = 1; seed <= 200; seed++) {
+      const board = placeFleetRandomly(createBoard(), FLEET, seededRng(seed));
+      board.ships.forEach((ship, i) => {
+        for (const [r, c] of ship.cells)
+          for (let dr = -1; dr <= 1; dr++)
+            for (let dc = -1; dc <= 1; dc++) {
+              const n = board.cells[r + dr]?.[c + dc];
+              if (n && n.shipIndex !== null) assert.equal(n.shipIndex, i, `seed ${seed}: ships touch`);
+            }
+      });
+    }
+  });
+
+  test('touchesOtherShip detects side and diagonal contact', () => {
+    const board = createBoard();
+    placeShip(board, cruiser, 4, 4, true); // (4,4)-(4,6)
+    assert.equal(touchesOtherShip(board, 2, 5, 4, true), true); // directly below
+    assert.equal(touchesOtherShip(board, 2, 3, 7, true), true); // diagonal
+    assert.equal(touchesOtherShip(board, 2, 6, 4, true), false); // one row gap
   });
 });
 
