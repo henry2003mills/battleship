@@ -9,8 +9,7 @@ import {
   allShipsSunk,
   getShipCells,
   createComputerPlayer,
-  touchesOtherShip,
-} from './game.js?v=5';
+} from './game.js?v=7';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -190,10 +189,7 @@ function paintPreview() {
 }
 
 function canPlaceManually(length, row, col) {
-  return (
-    canPlaceShip(state.player, length, row, col, state.horizontal) &&
-    !touchesOtherShip(state.player, length, row, col, state.horizontal)
-  );
+  return canPlaceShip(state.player, length, row, col, state.horizontal);
 }
 
 const BOAT_KEY = {
