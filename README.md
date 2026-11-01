@@ -5,7 +5,7 @@ Single-page Battleship in plain HTML, CSS and JavaScript (no build step, no depe
 ## How to play
 
 1. **Place your fleet** from James Bond films: Liparus 5 (The Spy Who Loved Me), Disco Volante 4 (Thunderball), Q-Boat 3 (The World Is Not Enough), Wet Nellie 3 (The Spy Who Loved Me), Glastron 2 (Live and Let Die):
-   - Pick a ship, then click a cell on *Your fleet*. A green/red preview shows whether it fits.
+   - Pick a ship, then click a cell on *Your fleet*. A preview in the ship's color shows where it goes (red if it doesn't fit). Ships may touch when placed by hand.
    - Rotate with the **Rotate** button, the **R** key, or right-click.
    - Or click **Place randomly** (random placement never lets ships touch). **Clear** removes all placed ships.
    - Each ship has its own color, shown in the legend under each board.
@@ -17,10 +17,11 @@ The computer places its ships randomly and uses a **hunt-and-target** strategy: 
 
 ## Project layout
 
-- `index.html`, `styles.css`: page and styling
+- `index.html`, `styles.css`, `assets/`: page, styling and gun-barrel backdrop
+- `sw.js`: service worker that always fetches the newest version, so updates show up without waiting on the browser cache
 - `src/game.js`: game logic (board, placement, attacks, sinking, win detection, computer AI). No DOM access.
 - `src/ui.js`: DOM rendering and event handling
-- `tests/game.test.js`: unit tests
+- `tests/game.test.js`, `tests/edge-cases.test.js`: unit tests
 
 ## Run locally
 
@@ -39,4 +40,4 @@ Requires Node.js 18+ (uses the built-in `node:test` runner, no install needed):
 npm test
 ```
 
-The tests cover ship placement (bounds, overlap, random fleet placement), hit/miss/repeat detection, sinking, win logic, and the computer's hunt-and-target behaviour.
+The tests cover ship placement (bounds, overlap, random fleet placement), hit/miss/repeat detection, sinking, win logic, the computer's hunt-and-target behaviour, and invalid input (bad lengths/coordinates, duplicate ships).
