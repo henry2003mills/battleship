@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Battleship</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9A%93</text></svg>" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
   <header>
@@ -25,6 +28,12 @@
     </div>
   </section>
 
+  <div class="battle-area">
+  <aside class="boat-key" aria-label="Fleet key">
+    <h2>Fleet key</h2>
+    <ul id="boat-key"></ul>
+  </aside>
+
   <main class="boards">
     <section class="board-wrap">
       <h2>Your fleet</h2>
@@ -37,6 +46,7 @@
       <ul class="fleet-status" id="computer-fleet"></ul>
     </section>
   </main>
+  </div>
 
   <section class="log-wrap">
     <h2>Battle log</h2>
@@ -51,6 +61,6 @@
     </div>
   </div>
 
-  <script type="module" src="src/ui.js?v=4"></script>
+  <script type="module" src="src/ui.js?v=5"></script>
 </body>
 </html>

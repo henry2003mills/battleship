@@ -10,7 +10,7 @@ import {
   getShipCells,
   createComputerPlayer,
   touchesOtherShip,
-} from './game.js?v=4';
+} from './game.js?v=5';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -28,6 +28,7 @@ const els = {
   playerFleet: $('player-fleet'),
   computerFleet: $('computer-fleet'),
   log: $('log'),
+  boatKey: $('boat-key'),
   overlay: $('overlay'),
   overlayTitle: $('overlay-title'),
   overlayText: $('overlay-text'),
@@ -55,7 +56,7 @@ let state;
 const backgroundRegions = () => [
   document.querySelector('header'),
   els.setup,
-  document.querySelector('main'),
+  document.querySelector('.battle-area'),
   document.querySelector('.log-wrap'),
 ];
 
@@ -193,6 +194,44 @@ function canPlaceManually(length, row, col) {
     canPlaceShip(state.player, length, row, col, state.horizontal) &&
     !touchesOtherShip(state.player, length, row, col, state.horizontal)
   );
+}
+
+const BOAT_KEY = {
+  'Liparus': {
+    film: 'The Spy Who Loved Me',
+    art: 'M4 28H114L106 38H12Z M10 28V16H26V28 M14 16V10H20V16 M32 28V24H100V28 M108 30L104 36',
+  },
+  'Disco Volante': {
+    film: 'Thunderball',
+    art: 'M6 24H114L104 32H14Z M30 24L38 14H82L92 24 M42 19H80 M60 14V6 M30 32V38 M90 32V38 M24 38H38 M84 38H98',
+  },
+  'Q-Boat': {
+    film: 'The World Is Not Enough',
+    art: 'M12 26H110L100 34H20Z M44 26L54 18H72L78 26 M10 29L2 27 M10 33L2 34',
+  },
+  'Wet Nellie': {
+    film: 'The Spy Who Loved Me',
+    art: 'M10 30L22 22L52 16L88 18L112 26V30Z M48 17L60 23H86 M18 30V36 M104 30V36 M10 30L3 25 M10 30L3 35',
+  },
+  'Glastron': {
+    film: 'Live and Let Die',
+    art: 'M16 24H108L96 32H26Z M50 24L58 16L66 24 M16 20V34H10V20Z',
+  },
+};
+
+function renderBoatKey() {
+  for (const spec of FLEET) {
+    const { film, art } = BOAT_KEY[spec.name];
+    const li = document.createElement('li');
+    li.style.color = SHIP_COLORS[spec.name];
+    li.innerHTML =
+      `<svg viewBox="0 0 120 44" aria-hidden="true"><path d="${art}" fill="currentColor" ` +
+      'fill-opacity="0.15" stroke="currentColor" stroke-width="2" stroke-linejoin="round" ' +
+      'stroke-linecap="round"/></svg>' +
+      `<span class="boat-name">${spec.name}</span>` +
+      `<span class="boat-meta">${spec.length} squares · ${film}</span>`;
+    els.boatKey.appendChild(li);
+  }
 }
 
 function renderFleetStatus(listEl, board, showAll) {
@@ -395,4 +434,5 @@ els.restart.addEventListener('click', newGame);
 els.overlayRestart.addEventListener('click', newGame);
 
 document.documentElement.classList.toggle('no-emoji', !emojiSupported());
+renderBoatKey();
 newGame();
