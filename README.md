@@ -4,7 +4,7 @@ Single-page Battleship in plain HTML, CSS and JavaScript (no build step, no depe
 
 ## How to play
 
-1. **Place your fleet** (Carrier 5, Battleship 4, Cruiser 3, Submarine 3, Destroyer 2):
+1. **Place your fleet** from James Bond films: Liparus 5 (The Spy Who Loved Me), Disco Volante 4 (Thunderball), Q-Boat 3 (The World Is Not Enough), Wet Nellie 3 (The Spy Who Loved Me), Glastron 2 (Live and Let Die):
    - Pick a ship, then click a cell on *Your fleet*. A green/red preview shows whether it fits.
    - Rotate with the **Rotate** button, the **R** key, or right-click.
    - Or click **Place randomly** (random placement never lets ships touch). **Clear** removes all placed ships.

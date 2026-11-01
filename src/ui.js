@@ -10,7 +10,7 @@ import {
   getShipCells,
   createComputerPlayer,
   touchesOtherShip,
-} from './game.js?v=3';
+} from './game.js?v=4';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -36,11 +36,11 @@ const els = {
 
 const COMPUTER_DELAY_MS = 600;
 const SHIP_COLORS = {
-  Carrier: '#a7b1bd',
-  Battleship: '#c9ad74',
-  Cruiser: '#86b894',
-  Submarine: '#b493c2',
-  Destroyer: '#7fbcd6',
+  'Liparus': '#a7b1bd',
+  'Disco Volante': '#c9ad74',
+  'Q-Boat': '#86b894',
+  'Wet Nellie': '#b493c2',
+  'Glastron': '#7fbcd6',
 };
 const JOIN_DIRS = [
   ['up', -1, 0, '0 -2px'],

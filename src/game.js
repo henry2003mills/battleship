@@ -1,11 +1,11 @@
 export const BOARD_SIZE = 10;
 
 export const FLEET = Object.freeze([
-  { name: 'Carrier', length: 5 },
-  { name: 'Battleship', length: 4 },
-  { name: 'Cruiser', length: 3 },
-  { name: 'Submarine', length: 3 },
-  { name: 'Destroyer', length: 2 },
+  { name: 'Liparus', length: 5 },
+  { name: 'Disco Volante', length: 4 },
+  { name: 'Q-Boat', length: 3 },
+  { name: 'Wet Nellie', length: 3 },
+  { name: 'Glastron', length: 2 },
 ]);
 
 export function createBoard(size = BOARD_SIZE) {
