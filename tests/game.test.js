@@ -23,6 +23,7 @@ function seededRng(seed = 1) {
 }
 
 const destroyer = { name: 'Destroyer', length: 2 };
+const patrol = { name: 'Patrol Boat', length: 2 };
 const cruiser = { name: 'Cruiser', length: 3 };
 
 describe('placement', () => {
@@ -152,7 +153,7 @@ describe('sinking', () => {
   test('sinking one ship does not affect another', () => {
     const board = createBoard();
     const a = placeShip(board, destroyer, 0, 0, true);
-    const b = placeShip(board, destroyer, 1, 0, true);
+    const b = placeShip(board, patrol, 1, 0, true);
     receiveAttack(board, 0, 0);
     receiveAttack(board, 0, 1);
     assert.equal(isSunk(a), true);
@@ -168,7 +169,7 @@ describe('win logic', () => {
   test('not won while any ship is afloat', () => {
     const board = createBoard();
     placeShip(board, destroyer, 0, 0, true);
-    placeShip(board, destroyer, 2, 0, true);
+    placeShip(board, patrol, 2, 0, true);
     receiveAttack(board, 0, 0);
     receiveAttack(board, 0, 1);
     receiveAttack(board, 2, 0);

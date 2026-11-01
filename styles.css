@@ -29,8 +29,9 @@ h2 { font-size: 1.05rem; margin: 0 0 8px; }
 button {
   font: inherit; cursor: pointer; border: 1px solid #3c5d7c; border-radius: 6px;
   background: var(--panel); color: var(--text); padding: 6px 12px;
+  touch-action: manipulation;
 }
-button:hover:not(:disabled) { background: #1b3a57; }
+button:not(.cell):hover:not(:disabled) { background: #1b3a57; }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
 button.primary { background: #2b7bd0; border-color: #2b7bd0; }
 button.primary:hover:not(:disabled) { background: #3a8ce3; }
@@ -74,7 +75,7 @@ button.primary:hover:not(:disabled) { background: #3a8ce3; }
 .cell.join-down { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 .cell.join-left { border-top-left-radius: 0; border-bottom-left-radius: 0; }
 .cell.join-right { border-top-right-radius: 0; border-bottom-right-radius: 0; }
-.cell.preview-ok { --fill: var(--ok); }
+.cell.preview-ok { --fill: var(--preview-color, var(--ok)); opacity: 0.6; }
 .cell.preview-bad { --fill: var(--bad); }
 .cell.miss::after {
   content: ""; width: 30%; height: 30%; border-radius: 50%; background: var(--miss);
@@ -89,7 +90,18 @@ button.primary:hover:not(:disabled) { background: #3a8ce3; }
 }
 .cell.sunk { --fill: var(--sunk); }
 .cell.sunk::after { opacity: 0.55; }
-#computer-board.active .cell.targetable:hover { --fill: var(--water-hover); cursor: crosshair; }
+.no-emoji #computer-board .cell.hit::after, .no-emoji #computer-board .cell.sunk::after {
+  content: ""; width: 68%; height: 68%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M2 21V3h4v8l5-3v3l5-3v3l6-3.5V21zM5 15h3v3H5zm5.5 0h3v3h-3zm5.5 0h3v3h-3z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+#player-board .cell.ship.hit, #player-board .cell.ship.sunk { --fill: var(--ship-color); }
+#player-board .cell.ship.sunk { filter: brightness(0.5); }
+#player-board .cell.hit::after, #player-board .cell.sunk::after {
+  color: var(--hit); font-size: 1.35em; text-shadow: 0 0 2px #000; opacity: 1;
+}
+@media (hover: hover) {
+  #computer-board.active .cell.targetable:hover { --fill: var(--water-hover); cursor: crosshair; }
+}
 .cell.last-shot { outline: 2px solid #ffd54a; outline-offset: -2px; z-index: 1; }
 
 .fleet-status { list-style: none; padding: 0; margin: 8px 0 0; font-size: 0.9rem; }

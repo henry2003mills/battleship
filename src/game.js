@@ -19,7 +19,10 @@ export function createBoard(size = BOARD_SIZE) {
 }
 
 export function inBounds(board, row, col) {
-  return row >= 0 && col >= 0 && row < board.size && col < board.size;
+  return (
+    Number.isInteger(row) && Number.isInteger(col) &&
+    row >= 0 && col >= 0 && row < board.size && col < board.size
+  );
 }
 
 export function getShipCells(length, row, col, horizontal) {
@@ -28,7 +31,12 @@ export function getShipCells(length, row, col, horizontal) {
   );
 }
 
+export function isValidLength(length) {
+  return Number.isInteger(length) && length > 0;
+}
+
 export function canPlaceShip(board, length, row, col, horizontal) {
+  if (!isValidLength(length)) return false;
   return getShipCells(length, row, col, horizontal).every(
     ([r, c]) => inBounds(board, r, c) && board.cells[r][c].shipIndex === null
   );
@@ -36,6 +44,7 @@ export function canPlaceShip(board, length, row, col, horizontal) {
 
 export function placeShip(board, { name, length }, row, col, horizontal) {
   if (!canPlaceShip(board, length, row, col, horizontal)) return null;
+  if (board.ships.some((s) => s.name === name)) return null;
   const ship = {
     name,
     length,
@@ -67,9 +76,17 @@ export function placeFleetRandomly(
   rng = Math.random,
   { allowTouching = false } = {}
 ) {
+  const placedBefore = board.ships.length;
+  const rollBack = () => {
+    for (const ship of board.ships.splice(placedBefore))
+      for (const [r, c] of ship.cells) board.cells[r][c].shipIndex = null;
+  };
   for (const spec of fleet) {
     for (let attempt = 0; ; attempt++) {
-      if (attempt > 10000) throw new Error(`Could not place ${spec.name}`);
+      if (attempt > 10000) {
+        rollBack();
+        throw new Error(`Could not place ${spec.name}`);
+      }
       const horizontal = rng() < 0.5;
       const row = Math.floor(rng() * board.size);
       const col = Math.floor(rng() * board.size);

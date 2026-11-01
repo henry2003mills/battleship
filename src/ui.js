@@ -9,7 +9,8 @@ import {
   allShipsSunk,
   getShipCells,
   createComputerPlayer,
-} from './game.js';
+  touchesOtherShip,
+} from './game.js?v=3';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -51,8 +52,26 @@ const COLS = 'ABCDEFGHIJ';
 const coord = (r, c) => `${COLS[c]}${r + 1}`;
 
 let state;
+const backgroundRegions = () => [
+  document.querySelector('header'),
+  els.setup,
+  document.querySelector('main'),
+  document.querySelector('.log-wrap'),
+];
+
+function emojiSupported() {
+  const ctx = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  if (!ctx) return true;
+  ctx.font = '32px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+  ctx.textBaseline = 'top';
+  ctx.fillText('\u{1F3ED}', 0, 0);
+  const px = ctx.getImageData(0, 0, 40, 40).data;
+  for (let i = 0; i < px.length; i += 4) if (px[i] !== px[i + 1] || px[i + 1] !== px[i + 2]) return true;
+  return false;
+}
 
 function newGame() {
+  if (state) clearTimeout(state.computerTimer);
   state = {
     phase: 'setup', // setup | player | computer | over
     horizontal: true,
@@ -62,7 +81,10 @@ function newGame() {
     ai: createComputerPlayer(),
     hover: null,
     lastShot: { player: null, computer: null },
+    computerTimer: null,
+    playerSunk: null,
   };
+  for (const region of backgroundRegions()) region.inert = false;
   els.log.innerHTML = '';
   els.overlay.classList.add('hidden');
   els.setup.classList.remove('hidden');
@@ -110,7 +132,7 @@ function cellEl(container, r, c) {
   return container.querySelector(`.cell[data-row="${r}"][data-col="${c}"]`);
 }
 
-function paintBoard(container, board, { revealShips, last }) {
+function paintBoard(container, board, { revealShips, last, owner }) {
   const visibleShip = (r, c) => {
     const index = board.cells[r]?.[c]?.shipIndex;
     if (index === null || index === undefined) return null;
@@ -141,6 +163,14 @@ function paintBoard(container, board, { revealShips, last }) {
       }
       if (shot) el.classList.add(ship ? (sunk ? 'sunk' : 'hit') : 'miss');
       else el.classList.add('targetable');
+      const label = [coord(r, c)];
+      if (shown !== null) label.push(owner === 'player' ? `your ${ship.name}` : ship.name);
+      if (shot) label.push(ship ? (sunk ? 'sunk' : 'hit') : 'miss');
+      el.setAttribute('aria-label', label.join(', '));
+      const inactive = owner === 'computer' ? shot : state.phase !== 'setup';
+      el.tabIndex = inactive ? -1 : 0;
+      if (inactive) el.setAttribute('aria-disabled', 'true');
+      else el.removeAttribute('aria-disabled');
       if (last && last[0] === r && last[1] === c) el.classList.add('last-shot');
     }
   }
@@ -148,13 +178,21 @@ function paintBoard(container, board, { revealShips, last }) {
 
 function paintPreview() {
   if (state.phase !== 'setup' || !state.hover || state.selected === null) return;
-  const { length } = FLEET[state.selected];
+  const { name, length } = FLEET[state.selected];
   const [row, col] = state.hover;
-  const ok = canPlaceShip(state.player, length, row, col, state.horizontal);
+  const ok = canPlaceManually(length, row, col);
   for (const [r, c] of getShipCells(length, row, col, state.horizontal)) {
     const el = r < BOARD_SIZE && c < BOARD_SIZE ? cellEl(els.playerBoard, r, c) : null;
     el?.classList.add(ok ? 'preview-ok' : 'preview-bad');
+    if (ok) el?.style.setProperty('--preview-color', SHIP_COLORS[name]);
   }
+}
+
+function canPlaceManually(length, row, col) {
+  return (
+    canPlaceShip(state.player, length, row, col, state.horizontal) &&
+    !touchesOtherShip(state.player, length, row, col, state.horizontal)
+  );
 }
 
 function renderFleetStatus(listEl, board, showAll) {
@@ -212,10 +250,15 @@ function renderStatus() {
 }
 
 function renderAll() {
-  paintBoard(els.playerBoard, state.player, { revealShips: true, last: state.lastShot.computer });
+  paintBoard(els.playerBoard, state.player, {
+    revealShips: true,
+    last: state.lastShot.computer,
+    owner: 'player',
+  });
   paintBoard(els.computerBoard, state.computer, {
     revealShips: state.phase === 'over',
     last: state.lastShot.player,
+    owner: 'computer',
   });
   paintPreview();
   els.computerBoard.classList.toggle('active', state.phase === 'player');
@@ -250,6 +293,8 @@ function endGame(winner) {
       ? 'You sank the entire enemy fleet.'
       : 'The computer sank your entire fleet.';
   els.overlay.classList.remove('hidden');
+  for (const region of backgroundRegions()) region.inert = true;
+  els.overlayRestart.focus();
 }
 
 function playerFire(r, c) {
@@ -257,18 +302,21 @@ function playerFire(r, c) {
   const res = receiveAttack(state.computer, r, c);
   if (res.result === 'repeat' || res.result === 'invalid') return;
   state.lastShot.player = [r, c];
+  state.playerSunk = res.result === 'sunk' ? res.ship.name : null;
   log(describe('You', r, c, res), res.result === 'sunk' ? 'sunk' : '');
   if (res.result === 'sunk') announce(`You sank the enemy's ${res.ship.name}!`);
   if (allShipsSunk(state.computer)) return endGame('player');
   state.phase = 'computer';
   renderAll();
   if (res.result === 'sunk') els.status.textContent = `You sank the enemy's ${res.ship.name}! Computer is aiming...`;
-  setTimeout(computerTurn, COMPUTER_DELAY_MS);
+  state.computerTimer = setTimeout(computerTurn, COMPUTER_DELAY_MS);
 }
 
 function computerTurn() {
   if (state.phase !== 'computer') return;
-  const [r, c] = state.ai.chooseShot();
+  const shot = state.ai.chooseShot();
+  if (!shot) return;
+  const [r, c] = shot;
   const res = receiveAttack(state.player, r, c);
   state.ai.recordResult(r, c, res.result, res.result === 'sunk' ? res.ship.cells : []);
   state.lastShot.computer = [r, c];
@@ -276,7 +324,11 @@ function computerTurn() {
   if (allShipsSunk(state.player)) return endGame('computer');
   state.phase = 'player';
   renderAll();
-  if (res.result === 'sunk') announce(`The computer sank your ${res.ship.name}! Your turn.`);
+  const notices = [];
+  if (state.playerSunk) notices.push(`You sank the enemy's ${state.playerSunk}!`);
+  if (res.result === 'sunk') notices.push(`The computer sank your ${res.ship.name}!`);
+  state.playerSunk = null;
+  if (notices.length) announce(`${notices.join(' ')} Your turn.`);
 }
 
 function announce(text) {
@@ -290,13 +342,15 @@ function rotate() {
 }
 
 buildGrid(els.playerBoard, (cell, r, c) => {
-  cell.addEventListener('mouseenter', () => {
+  cell.addEventListener('pointerenter', (e) => {
+    if (e.pointerType !== 'mouse') return;
     state.hover = [r, c];
     if (state.phase === 'setup') renderAll();
   });
   cell.addEventListener('click', () => {
     if (state.phase !== 'setup' || state.selected === null) return;
-    if (placeShip(state.player, FLEET[state.selected], r, c, state.horizontal)) {
+    const spec = FLEET[state.selected];
+    if (canPlaceManually(spec.length, r, c) && placeShip(state.player, spec, r, c, state.horizontal)) {
       state.selected = nextUnplaced();
       renderAll();
     }
@@ -307,7 +361,8 @@ buildGrid(els.playerBoard, (cell, r, c) => {
     rotate();
   });
 });
-els.playerBoard.addEventListener('mouseleave', () => {
+els.playerBoard.addEventListener('pointerleave', (e) => {
+  if (e.pointerType !== 'mouse') return;
   state.hover = null;
   if (state.phase === 'setup') renderAll();
 });
@@ -339,4 +394,5 @@ els.start.addEventListener('click', () => {
 els.restart.addEventListener('click', newGame);
 els.overlayRestart.addEventListener('click', newGame);
 
+document.documentElement.classList.toggle('no-emoji', !emojiSupported());
 newGame();
