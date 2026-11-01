@@ -25,7 +25,7 @@ body {
 }
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: #050505 url("assets/gunbarrel.svg?v=5") center / cover no-repeat;
+  background: #050505 url("assets/gunbarrel.svg?v=8") center / cover no-repeat;
 }
 header {
   display: flex; align-items: center; justify-content: space-between;

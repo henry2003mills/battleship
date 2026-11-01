@@ -9,7 +9,7 @@ import {
   allShipsSunk,
   getShipCells,
   createComputerPlayer,
-} from './game.js?v=7';
+} from './game.js?v=8';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -432,3 +432,5 @@ els.overlayRestart.addEventListener('click', newGame);
 document.documentElement.classList.toggle('no-emoji', !emojiSupported());
 renderBoatKey();
 newGame();
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
