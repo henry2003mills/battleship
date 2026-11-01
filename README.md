@@ -2,6 +2,9 @@
 
 Single-page Battleship in plain HTML, CSS and JavaScript (no build step, no dependencies). You play against a computer opponent.
 
+**Play:** https://henry2003mills.github.io/battleship/  
+**Bugs found and how they were fixed:** [BUGS.md](BUGS.md)
+
 ## How to play
 
 1. **Place your fleet** from James Bond films: Liparus 5 (The Spy Who Loved Me), Disco Volante 4 (Thunderball), Q-Boat 3 (The World Is Not Enough), Wet Nellie 3 (The Spy Who Loved Me), Glastron 2 (Live and Let Die):
