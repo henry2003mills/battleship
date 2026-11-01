@@ -54,6 +54,7 @@ button.primary:hover:not(:disabled) { background: #3a8ce3; }
 }
 #setup-panel.hidden { display: none; }
 .setup-ships, .setup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+#rotate-btn { min-width: 11.5em; }
 .ship-choice.selected { outline: 2px solid #ffd54a; }
 .ship-choice.placed { text-decoration: line-through; opacity: 0.5; }
 
